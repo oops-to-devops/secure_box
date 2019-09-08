@@ -1,0 +1,16 @@
+
+box_option_lynis_install_git: true
+
+box_lynis_version: "2.7.5"
+box_lynis_user: root
+box_lynis_ssh_known_hosts:
+  - github.com
+  - bitbucket.org
+
+box_option_rkhunter_force_updatescan_cron: false
+
+
+box_auditd_conf_default_props:
+    - {regexp: "^log_group =*", line: "log_group = {{ auditd_log_group }}"}
+
+box_auditd_log_group: root # set to syslog if you want to forward audit events

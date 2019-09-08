@@ -1,0 +1,11 @@
+- src: softasap.sa-secure-audit-rkhunter
+  name: sa_secure_audit_rkhunter
+- src: softasap.sa-secure-audit-lynis
+  name: sa_secure_audit_lynis
+- src: softasap.sa-secure-audit-debsums
+  name: sa_secure_audit_debsums
+- src: softasap.sa-secure-auditd
+  name: sa_secure_auditd
+- src: https://github.com/openstack/ansible-hardening.git
+  version: 16.0.29
+  name: ansible_hardening

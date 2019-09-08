@@ -1,0 +1,77 @@
+---
+- hosts: all
+  gather_facts: False
+
+  vars:
+    - root_dir: "{{ playbook_dir }}"
+    - shared_dir: "{{ playbook_dir }}/../shared"
+
+
+  vars_files:
+    - ./secure_vars.yml
+
+  pre_tasks:
+    - debug: msg="Pre tasks section"
+      tags: always
+
+    - name: ANSIBLE PYTHON | install python 2
+      raw: test -e /usr/bin/python || (apt -qqy update && apt install -qy python-minimal)
+      become: yes
+      tags: always
+
+    - name:  UNPRIVILEGED USERS | Get acl dependency (ansible unprivileged user operations magic)
+      apt: pkg="acl"
+      become: yes
+      tags: always
+
+    - name: gather facts
+      setup:
+      tags: always
+
+    - name: Check for common pretasks
+      local_action: stat path="{{shared_dir}}/common_pretasks.yml"
+      register: common_pretasks_exists
+      tags: always
+
+    - name: Include common pretasks
+      include_tasks: "{{shared_dir}}/common_pretasks.yml"
+      when: common_pretasks_exists.stat.exists == true
+      tags: always
+
+  roles:
+
+      - {
+          role: "sa_secure_audit_debsums",
+          tags: [create, secure_audit_debsums],
+        }
+      - {
+          role: "sa_secure_audit_lynis",
+          tags: [create, secure_audit_lynis],
+          option_lynis_install_git: "{{ box_option_lynis_install_git }}",
+          lynis_version: "{{ box_lynis_version }}",
+          lynis_user: "{{ box_lynis_user }}",
+          lynis_ssh_known_hosts: "{{ box_lynis_ssh_known_hosts }}"
+
+        }
+      - {
+          role: "sa_secure_audit_rkhunter",
+          option_force_updatescan_cron: "{{ box_option_rkhunter_force_updatescan_cron }}",
+          tags: [create, secure_audit_rkhunter],
+        }
+      - {
+          role: "sa_secure_auditd",
+          auditd_conf_default_props: "{{ box_auditd_conf_default_props }}",
+          auditd_log_group: "{{ box_auditd_log_group }}"
+
+          tags: [create, sa_secure_auditd],
+        }
+      - {
+          role: "ansible_hardening",
+          tags: [create, ansible_hardening],
+          become: yes
+        }
+
+
+  tasks:
+
+    - debug: msg="Pre tasks section"
