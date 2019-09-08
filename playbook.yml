@@ -43,6 +43,7 @@
       - {
           role: "sa_secure_audit_debsums",
           tags: [create, secure_audit_debsums],
+          when: option_securebox_install_debsums
         }
       - {
           role: "sa_secure_audit_lynis",
@@ -50,28 +51,32 @@
           option_lynis_install_git: "{{ box_option_lynis_install_git }}",
           lynis_version: "{{ box_lynis_version }}",
           lynis_user: "{{ box_lynis_user }}",
-          lynis_ssh_known_hosts: "{{ box_lynis_ssh_known_hosts }}"
-
+          lynis_ssh_known_hosts: "{{ box_lynis_ssh_known_hosts }}",
+          when: option_securebox_install_lynis
         }
       - {
           role: "sa_secure_audit_rkhunter",
           option_force_updatescan_cron: "{{ box_option_rkhunter_force_updatescan_cron }}",
           tags: [create, secure_audit_rkhunter],
+          when: option_securebox_install_rkhunter
         }
       - {
           role: "sa_secure_auditd",
           auditd_conf_default_props: "{{ box_auditd_conf_default_props }}",
-          auditd_log_group: "{{ box_auditd_log_group }}"
-
+          auditd_log_group: "{{ box_auditd_log_group }}",
           tags: [create, sa_secure_auditd],
+          when: option_securebox_install_auditd
         }
       - {
           role: "ansible_hardening",
           tags: [create, ansible_hardening],
-          become: yes
+          become: yes,
+          when: option_securebox_install_openstack_hardening
         }
 
 
   tasks:
 
-    - debug: msg="Pre tasks section"
+    - debug: msg="Tasks section"
+
+
